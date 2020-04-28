@@ -7,8 +7,12 @@
 //
 
 #import "CCViewController.h"
+#import <CCException/CCExceptionManager.h>
+#import <CCException/NSArray+Crash.h>
+#import "CCArray.h"
+#import <objc/runtime.h>
 
-@interface CCViewController ()
+@interface CCViewController ()<CCExceptionProtocol>
 
 @end
 
@@ -17,13 +21,41 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+    
+    [[CCExceptionManager sharedInstance] registerExceptionHandlerObj:self];
+    
+
+    NSString *unsafeObj = nil;
+    
+    
+    NSMutableDictionary *mutableDict = @{@"1" : unsafeObj}.mutableCopy;
+
+    [mutableDict setObject:unsafeObj forKey:@"2"];
+
+    NSArray *aArray = @[@"0", @"1", @"2"];
+
+    id element = aArray[3];
+
+    
+    NSArray *bArray = @[@"0", unsafeObj, @"2"];
+    
+    NSMutableArray *cArray = [NSMutableArray array];
+    
+    [cArray setObject:unsafeObj atIndexedSubscript:0];
+    
+    [cArray insertObject:unsafeObj atIndex:0];
+    
+    [cArray addObject:unsafeObj];
+    
+    cArray[99];
+    
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)handlerExceptionManager:(CCExceptionManager *)mgr exception:(NSException *)exception{
+    
+    // upload exception
+    
+    
 }
 
 @end
